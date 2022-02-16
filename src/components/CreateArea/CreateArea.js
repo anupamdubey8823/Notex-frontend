@@ -42,6 +42,7 @@ const CreateArea = ({ onAdd, id }) => {
                 Title: "",
                 Content: "",
             });
+            setExpanded(false);
             const url = new URL("add", BACKEND_URL);
 
             axios.post(url, createArea).then((res) => console.log(res.data));
@@ -51,7 +52,11 @@ const CreateArea = ({ onAdd, id }) => {
     const submitEditedNote = (event) => {
         event.preventDefault();
         const url = new URL("update/" + id, BACKEND_URL);
-        console.log(createArea);
+        setCreateArea({
+            Title: "",
+            Content: "",
+        });
+        setExpanded(false);
 
         axios.post(url, createArea).then((res) => console.log(res.data));
     };
