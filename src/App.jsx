@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 
 import Header from "./components/Header";
-import CreateArea from "./components/CreateArea/CreateArea";
+import CreateArea from "./components/CreateArea";
 import Note from "./components/Note";
 import Footer from "./components/Footer";
 import { BACKEND_URL } from "./constants/APIrequestUrl";
@@ -33,7 +33,7 @@ const App = () => {
       setNotes(response.data);
     }
     fetchNotes();
-  }, [notes]);
+  }, []);
 
   // Display new note after creation
   const addNote = (note) => {
@@ -41,48 +41,17 @@ const App = () => {
         return [...prevNotes, note];
       });
   }
-
-  // Delete the note
-  const removeNote = (id) => {
-    const url = new URL("delete/", BACKEND_URL)
-    axios
-      .delete(url + id)
-      .then((res) => console.log(res.data));
-    
-      setNotes(prevNotes => {
-      return prevNotes.filter(noteItem => noteItem._id !== id)
-    });
-  }
-
-  // Edit notes
-  const editNote = (id) => {
-    const editItem = notes.find((currentNote) => {
-      return currentNote._id === id;
-    })
-    
-    setCreateArea({
-      Title: editItem.Title,
-      Content: editItem.Content
-    });
-    setExpanded(true);
-    setEditOrCreate("edit");
-    setEditNoteId(id);
-  }
   
   // Render all notes from the DB
   const NotesList = () => {
     return notes.map((currentNote) => {
       return (
-        <CreateAreaContext.Provider value={{ notes, createArea, setCreateArea, isExpanded, setExpanded, editOrCreate, setEditOrCreate, setEditNoteId }}>
           <Note
             key={currentNote._id}
             id={currentNote._id}
-            onDelete={removeNote}
             Title={currentNote.Title}
             Content={currentNote.Content}
-            onEdit={editNote}
           />
-        </CreateAreaContext.Provider>
       );
     });
   }
@@ -91,7 +60,7 @@ const App = () => {
   return (
     <>
       <Header />
-      <CreateAreaContext.Provider value={{ createArea, setCreateArea, isExpanded, setExpanded, editOrCreate, setEditOrCreate }}>
+      <CreateAreaContext.Provider value={{ notes, setNotes, createArea, setCreateArea, isExpanded, setExpanded, editOrCreate, setEditOrCreate, setEditNoteId }}>
         <CreateArea onAdd={addNote} id={editNoteId} />
         <div className="content">{NotesList()}</div>
       </CreateAreaContext.Provider>

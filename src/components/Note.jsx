@@ -1,24 +1,39 @@
 import React, { useContext } from 'react';
+import axios from "axios";
+
 import DeleteIcon from '@material-ui/icons/Delete';
 import EditIcon from '@material-ui/icons/Edit';
 import styled from "styled-components";
+
 import { CreateAreaContext } from '../CreateAreaContext';
+import { BACKEND_URL } from '../constants/APIrequestUrl';
 
 const Note = (props) => {
 
     const {
         notes,
+        setNotes,
         setCreateArea,
         setExpanded,
         setEditOrCreate,
-        setEditNoteId
+        setEditNoteId,
     } = useContext(CreateAreaContext);
     
     /* EVENT HANDLERS */
 
     // Here, another id is passed to the Note component because 'key' cannot be passed in a component.
     const handleDelete = () => {
-        props.onDelete(props.id);
+        const removeNote = (id) => {
+            const url = new URL("delete/", BACKEND_URL)
+            axios
+              .delete(url + id)
+              .then((res) => console.log(res.data));
+            
+            setNotes(prevNotes => {
+                return prevNotes.filter(noteItem => noteItem._id !== id)
+            });
+        }
+        removeNote(props.id);
     }
     const handleEdit = () => {
         const editNote = (id) => {

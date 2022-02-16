@@ -1,17 +1,18 @@
-import React, { useContext, useEffect } from "react";
+import React, { useContext } from "react";
 import "./CreateArea.css";
 import AddIcon from "@material-ui/icons/Add";
 import EditIcon from "@material-ui/icons/Edit";
 import { Fab, Zoom } from "@material-ui/core";
 import axios from "axios";
-import { BACKEND_URL } from "../../constants/APIrequestUrl";
-import { CreateAreaContext } from "../../CreateAreaContext";
+import { BACKEND_URL } from "../constants/APIrequestUrl";
+import { CreateAreaContext } from "../CreateAreaContext";
 
 const CreateArea = ({ onAdd, id }) => {
     /* STATES */
 
     // Toggle the size of the Create Area if it is clicked on
     const {
+        setNotes,
         createArea,
         setCreateArea,
         isExpanded,
@@ -49,6 +50,11 @@ const CreateArea = ({ onAdd, id }) => {
         }
     };
 
+    const fetchNotes = async function () {
+        const response = await axios.get(BACKEND_URL);
+        setNotes(response.data);
+    }
+
     const submitEditedNote = (event) => {
         event.preventDefault();
         const url = new URL("update/" + id, BACKEND_URL);
@@ -57,8 +63,7 @@ const CreateArea = ({ onAdd, id }) => {
             Content: "",
         });
         setExpanded(false);
-
-        axios.post(url, createArea).then((res) => console.log(res.data));
+        axios.post(url, createArea).then(() => fetchNotes());
     };
 
     /* COMPONENT */
