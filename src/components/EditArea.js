@@ -5,14 +5,14 @@ import "./EditArea.css";
 import styled from "styled-components"
 import { BACKEND_URL } from "../constants/APIrequestUrl";
 
-const EditArea = props =>  {
+const EditArea = ({id, Title, Content}) =>  {
     
     /* STATES */
 
     // State for the Edit Area which initially has the same content as the note which is chosen to edit
     const [edit, setEdit] = useState({
-        Title: props.Title,
-        Content: props.Content
+        Title: Title,
+        Content: Content
     })
 
     /* EVENT HANDLERS */
@@ -30,7 +30,7 @@ const EditArea = props =>  {
     // Event handler for the submitting the edited note
     const handleClick = event => {
         event.preventDefault();
-        const url = new URL("update/"+props.id, BACKEND_URL)
+        const url = new URL("update/" + id, BACKEND_URL)
         axios 
             .post(url, edit)
             .then(res => console.log(res.data))

@@ -5,9 +5,13 @@ import Header from "./components/Header";
 import CreateArea from "./components/CreateArea/CreateArea";
 import Note from "./components/Note";
 import Footer from "./components/Footer";
-import EditArea from "./components/EditArea";
 import { BACKEND_URL } from "./constants/APIrequestUrl";
+import { CreateAreaContext } from "./CreateAreaContext";
 
+const initialState = {
+  Title: "", 
+  Content: ""
+}
 
 const App = () => {
   
@@ -15,12 +19,10 @@ const App = () => {
 
   // Initialize the states
   const [notes, setNotes] = useState([]); // Storing the notes in an array and setting acc. to changes
-  const [editInfo, setEditInfo] = useState({
-    Title: "",
-    Content: "",
-  }); // Handling changes in the Edit Area
+  const [createArea, setCreateArea] = useState(initialState);
+  const [isExpanded, setExpanded] = useState(false);
+  const [editOrCreate, setEditOrCreate] = useState("create");
   const [editNoteId, setEditNoteId] = useState(""); // Passing the id of the note on which Edit button is clicked
-  const [showEditArea, setEditArea] = useState(false); // Toggle the Edit Area
 
   /* EVENT HANDLERS */
 
@@ -31,7 +33,7 @@ const App = () => {
       setNotes(response.data);
     }
     fetchNotes();
-  }, []);
+  }, [notes]);
 
   // Display new note after creation
   const addNote = (note) => {
@@ -58,26 +60,29 @@ const App = () => {
       return currentNote._id === id;
     })
     
-    setEditArea(true);
-    setEditInfo({
+    setCreateArea({
       Title: editItem.Title,
       Content: editItem.Content
     });
+    setExpanded(true);
+    setEditOrCreate("edit");
     setEditNoteId(id);
   }
-
+  
   // Render all notes from the DB
   const NotesList = () => {
     return notes.map((currentNote) => {
       return (
-        <Note
-          key={currentNote._id}
-          id={currentNote._id}
-          onDelete={removeNote}
-          Title={currentNote.Title}
-          Content={currentNote.Content}
-          onEdit={editNote}
-        />
+        <CreateAreaContext.Provider value={{ notes, createArea, setCreateArea, isExpanded, setExpanded, editOrCreate, setEditOrCreate, setEditNoteId }}>
+          <Note
+            key={currentNote._id}
+            id={currentNote._id}
+            onDelete={removeNote}
+            Title={currentNote.Title}
+            Content={currentNote.Content}
+            onEdit={editNote}
+          />
+        </CreateAreaContext.Provider>
       );
     });
   }
@@ -86,9 +91,10 @@ const App = () => {
   return (
     <>
       <Header />
-      <CreateArea onAdd={addNote} />
-      <div className="content">{NotesList()}</div>
-      {showEditArea && <EditArea id={editNoteId} Title={editInfo.Title} Content={editInfo.Content} />}
+      <CreateAreaContext.Provider value={{ createArea, setCreateArea, isExpanded, setExpanded, editOrCreate, setEditOrCreate }}>
+        <CreateArea onAdd={addNote} id={editNoteId} />
+        <div className="content">{NotesList()}</div>
+      </CreateAreaContext.Provider>
       {<Footer />}
     </>
   );

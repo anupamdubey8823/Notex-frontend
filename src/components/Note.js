@@ -1,9 +1,18 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import DeleteIcon from '@material-ui/icons/Delete';
 import EditIcon from '@material-ui/icons/Edit';
 import styled from "styled-components";
+import { CreateAreaContext } from '../CreateAreaContext';
 
 const Note = (props) => {
+
+    const {
+        notes,
+        setCreateArea,
+        setExpanded,
+        setEditOrCreate,
+        setEditNoteId
+    } = useContext(CreateAreaContext);
     
     /* EVENT HANDLERS */
 
@@ -12,7 +21,20 @@ const Note = (props) => {
         props.onDelete(props.id);
     }
     const handleEdit = () => {
-        props.onEdit(props.id);
+        const editNote = (id) => {
+            const editItem = notes.find((currentNote) => {
+              return currentNote._id === id;
+            })
+            
+            setCreateArea({
+              Title: editItem.Title,
+              Content: editItem.Content
+            });
+            setExpanded(true);
+            setEditOrCreate("edit");
+            setEditNoteId(id);
+        }
+        editNote(props.id);
     }
 
     /* COMPONENT */
